@@ -1,0 +1,19 @@
+//
+// Created by HP on 23/12/2022.
+//
+
+#ifndef JULIA_ORM_SQLQUERYBUILDER_HPP
+#define JULIA_ORM_SQLQUERYBUILDER_HPP
+
+#include <string>
+#include <query/Query.hpp>
+
+class SQLQueryBuilder {
+public:
+    std::wstring build(Query* query);
+
+    static
+};
+
+
+#endif //JULIA_ORM_SQLQUERYBUILDER_HPP
