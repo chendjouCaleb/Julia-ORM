@@ -7,18 +7,24 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include "DbSet.hpp"
 
 class Database {
 public:
     std::wstring name;
-    std::vector<DbSet*> dbSets;
+    std::map<std::wstring, DbSet*> dbSets;
+
+
+    bool hasDbSet(const std::wstring& dbSetName) {
+        return dbSets.find(dbSetName) != dbSets.end();
+    }
 
     std::wstring toString() {
         std::wstring value = L"database " + name + L" {\n";
 
-        for(auto set: dbSets) {
-            value.append(L"    " + set->toString() + L"\n");
+        for(auto &set: dbSets) {
+            value.append(L"    " + set.second->toString() + L"\n");
         }
 
         value.append(L"}");

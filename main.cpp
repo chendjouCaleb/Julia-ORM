@@ -12,8 +12,10 @@ int main() {
                        "entity Book { @Auto @PrimaryKey id: int; title: String; subTitle: String? author: Author }\n"
                        "entity Author { @PrimaryKey id: int; name: string ; books: Book[] }";
 
-    auto schema_text2 = L"database DbName {dbset<Books> books; dbset<Authors> authors;}"
-                        "entity Book { @Auto @PrimaryKey id: int; title: string; subTitle: string; author: Author }";
+    auto schema_text2 = L"database DbName {dbset<Book> books; dbset<Author> authors;}"
+                        "entity Book { @Auto @PrimaryKey id: int; title: string; subTitle: string; author: Author; authorId: int; }"
+                        "entity Author { id: int; name: string;}"
+                        ;
 
     Tokenizer tokenizer = Tokenizer::create(schema_text2);
     tokenizer.tokenize();
@@ -38,9 +40,14 @@ int main() {
 //        std::wcout << entity->toString() << std::endl;
 //    }
 
-    DbContextCreateResult buildResult = DbContext::build(schema_text);
+    DbContextCreateResult buildResult = DbContext::create(schema_text2);
 
-    if()
+    DbContext* dbContext = buildResult.dbContext;
 
+    std::wcout << "This is Db Schema: " << std::endl;
+    std::wcout << dbContext->schema->database->toString() << std::endl;
+
+    QueryResult queryResult = dbContext->toSQL(L"from b in books;");
+    std::wcout << "Query: " << queryResult.sql << std::endl;
     return 0;
 }

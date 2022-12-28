@@ -20,9 +20,9 @@ public:
 
     static Tokenizer create(std::wstring text);
 
-    const std::vector<Token *> &getTokens() const;
+    std::vector<Token *> getTokens() const;
 
-    void tokenize();
+    std::vector<Token *> tokenize();
 
     void take_word();
 

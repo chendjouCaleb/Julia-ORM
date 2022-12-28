@@ -6,34 +6,33 @@
 #define JULIA_ORM_DBCONTEXT_HPP
 
 #include "schema/Schema.hpp"
+#include "Error.hpp"
+#include "../parser/QueryBuilder.hpp"
 
 typedef class DbContext DbContext;
 
 struct DbContextCreateResult {
     DbContext *dbContext;
-    std::vector<Error> errors;
+    std::vector<Error> lexerErrors;
+    std::vector<Error> syntaxErrors;
+    std::vector<Error> schemaErrors;
 
     bool isSuccess() {
-        return errors.size() == 0;
+        return lexerErrors.empty() && syntaxErrors.empty() && schemaErrors.empty();
     }
 };
 
-struct QueryResult {
-    DbContext *dbContext;
-    std::vector<Error> errors;
-};
+
 
 class DbContext {
 public:
-    Schema* schema;
+    DbSchema* schema;
 
-    static DbContextCreateResult build(std::wstring schema);
-
+    static DbContextCreateResult create(std::wstring schema);
     static void destroy(DbContext* context);
 
     QueryResult toSQL(std::wstring text);
-
-
+    QueryResult query(std::wstring text);
 };
 
 #endif //JULIA_ORM_DBCONTEXT_HPP

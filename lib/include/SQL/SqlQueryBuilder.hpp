@@ -12,7 +12,9 @@ class SQLQueryBuilder {
 public:
     std::wstring build(Query* query);
 
-    static
+    static SQLQueryBuilder create() {
+        return SQLQueryBuilder();
+    }
 };
 
 

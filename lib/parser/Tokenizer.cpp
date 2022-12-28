@@ -16,7 +16,7 @@ Tokenizer Tokenizer::create(std::wstring text) {
 Tokenizer::Tokenizer(TextIterator it, std::vector<Token *> tokens) : _it(std::move(it)), tokens(std::move(tokens)) {};
 
 
-void Tokenizer::tokenize() {
+std::vector<Token *> Tokenizer::tokenize() {
     while(_it.has()) {
         skip_white_space();
         if (is_word_start()) {
@@ -31,6 +31,7 @@ void Tokenizer::tokenize() {
             throw "Unknown char";
         }
     }
+    return tokens;
 }
 
 void Tokenizer::take_word() {
@@ -97,7 +98,7 @@ bool Tokenizer::is_word_start() {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 }
 
-const std::vector<Token *> &Tokenizer::getTokens() const {
+std::vector<Token *> Tokenizer::getTokens() const {
     return tokens;
 }
 

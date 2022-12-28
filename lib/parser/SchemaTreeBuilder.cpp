@@ -22,6 +22,11 @@ void SchemaTreeBuilder::build() {
             _schema->entities.push_back(entity);
         }
     }
+
+    for (const auto &item : _schema->database->dbSets) {
+        item.second->entity = _schema->findEntity(item.second->entityName);
+    }
+
 }
 
 void SchemaTreeBuilder::takeDatabase() {
@@ -40,9 +45,11 @@ void SchemaTreeBuilder::takeDatabase() {
     _it.next();
 
     while (_it.has() && _it.current()->kind == Tk_Word && _it.current()->value == L"dbset") {
-        std::wcout << _it.current()->value << std::endl;
+        //std::wcout << _it.current()->value << std::endl;
         auto dbSet = takeDbSet();
-        db->dbSets.push_back(dbSet);
+        db->dbSets[dbSet->name] = dbSet;
+
+
     }
 
     if (!_it.has() || _it.current()->kind != Tk_BraceClose) {
@@ -81,7 +88,7 @@ DbSet *SchemaTreeBuilder::takeDbSet() {
     }
     dbSet->name = _it.current()->value;
     _it.next();
-    std::wcout << _it.current()->value << std::endl;
+    // std::wcout << _it.current()->value << std::endl;
     if (!_it.has() || _it.current()->kind != Tk_SemiColon) {
         // Expect ;.
     }
