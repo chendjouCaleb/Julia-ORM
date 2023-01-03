@@ -18,9 +18,14 @@ void SchemaTreeBuilder::build() {
             takeDatabase();
         }
 
-        if (_it.current()->kind == Tk_Word && _it.current()->value == "entity") {
+        else if (_it.current()->kind == Tk_Word && _it.current()->value == "entity") {
             auto entity = takeEntity();
             _schema->entities.push_back(entity);
+        }
+
+        else if (_it.current()->kind == Tk_Word && _it.current()->value == "interface") {
+            auto interface = takeInterface();
+            _schema->interfaces.push_back(interface);
         }
     }
 
@@ -97,8 +102,26 @@ DbSet *SchemaTreeBuilder::takeDbSet() {
     return dbSet;
 }
 
+Entity *SchemaTreeBuilder::takeEntity() {
+    // skip entity keyword.
+    _it.next();
+    TypeBlock block = takeBlock();
+
+    auto* entity = new Entity();
+    entity->name = block.name;
+    entity->fields = block.fields;
+
+    return entity;
+}
+
 Interface* SchemaTreeBuilder::takeInterface() {
+    // skip interface keyword.
+    _it.next();
+    TypeBlock block = takeBlock();
+
     auto interface = new Interface();
+    interface->name = block.name;
+    interface->fields = block.fields;
 
     return interface;
 }
@@ -129,44 +152,7 @@ TypeBlock SchemaTreeBuilder::takeBlock() {
 
     return block;
 }
-Entity *SchemaTreeBuilder::takeEntity() {
-    // skip entity keyword.
-    _it.next();
-    TypeBlock block = takeBlock();
 
-    auto* entity = new Entity();
-    entity->name = block.name;
-    entity->fields = block.fields;
-
-    return entity;
-}
-void takeEntity1() {
-//    // skip entity keyword.
-//    auto entity = new Entity();
-//    _it.next();
-//    if (!_it.has() || _it.current()->kind != Tk_Word) {
-//        // Expect entity name
-//    }
-//    entity->name = _it.current()->value;
-//    _it.next();
-//
-//    if (!_it.has() || _it.current()->kind != Tk_BraceOpen) {
-//        // Expect brace open.
-//    }
-//    _it.next();
-//
-//    while (_it.has() && _it.current()->kind != Tk_BraceClose) {
-//        auto field = takeField();
-//        entity->fields.push_back(field);
-//    }
-//
-//    if (!_it.has() || _it.current()->kind != Tk_BraceClose) {
-//        // Expect brace close.
-//    }
-//    _it.next();
-//
-//    return entity;
-}
 
 Field *SchemaTreeBuilder::takeField() {
     auto *field = new Field();

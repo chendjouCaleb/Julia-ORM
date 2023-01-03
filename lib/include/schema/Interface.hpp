@@ -9,8 +9,9 @@
 #include <vector>
 
 class Interface {
-    std::string name;
+public:
     std::vector<Field*> fields;
+    std::string name;
 
     std::string toString() {
         std::string value = "interface " + name + " {\n";
@@ -23,6 +24,8 @@ class Interface {
 
         return value;
     }
+
+
 };
 
 #endif //JULIA_ORM_INTERFACE_HPP

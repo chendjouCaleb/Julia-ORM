@@ -13,13 +13,14 @@ int main() {
                        "entity Author { @PrimaryKey id: int; name: string ; books: Book[] }";
 
     auto schema_text2 = "database DbName {dbset<Book> books; dbset<Author> authors;}"
+                        "interface Author { id: int; name: string;}"
                         "entity Book { @Auto @PrimaryKey id: int; title: string; subTitle: string; author: Author; authorId: int; }"
                         "entity Author { id: int; name: string;}"
                         ;
-    float a = .8;
-    Tokenizer tokenizer = Tokenizer::create(schema_text2);
-    tokenizer.tokenize();
-    std::vector<Token*> tokens = tokenizer.getTokens();
+//    float a = .8;
+//    Tokenizer tokenizer = Tokenizer::create(schema_text2);
+//    tokenizer.tokenize();
+//    std::vector<Token*> tokens = tokenizer.getTokens();
 //    Iterator<Token*> iterator = Iterator(&tokens);
 //    while (iterator.has()) {
 //        std::wcout << iterator.current()->value << std::endl;
@@ -30,9 +31,9 @@ int main() {
 //        std::wcout << token->value << std::endl;
 //    }
 
-    auto schemaBuilder = SchemaTreeBuilder::create(&tokens);
-    schemaBuilder.build();
-    auto schema = schemaBuilder.schema();
+//    auto schemaBuilder = SchemaTreeBuilder::create(&tokens);
+//    schemaBuilder.build();
+//    auto schema = schemaBuilder.schema();
 
 //    std::wcout << schema->database->toString() << std::endl;
 //
