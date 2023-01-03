@@ -16,7 +16,7 @@ int main() {
                         "entity Book { @Auto @PrimaryKey id: int; title: string; subTitle: string; author: Author; authorId: int; }"
                         "entity Author { id: int; name: string;}"
                         ;
-
+    float a = .8;
     Tokenizer tokenizer = Tokenizer::create(schema_text2);
     tokenizer.tokenize();
     std::vector<Token*> tokens = tokenizer.getTokens();

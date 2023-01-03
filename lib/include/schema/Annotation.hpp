@@ -9,10 +9,10 @@
 
 class Annotation {
 public:
-    std::wstring name;
+    std::string name;
 
-    [[nodiscard]] std::wstring toString() const {
-        return L"@" + name + L"()";
+    [[nodiscard]] std::string toString() const {
+        return "@" + name + "()";
     }
 };
 

@@ -5,12 +5,13 @@
 #include "SQL/SqlQueryBuilder.hpp"
 #include <string>
 #include <sstream>
-#include <cwctype>
 #include <algorithm>
 
 std::wstring SQLQueryBuilder::build(Query *query) {
+    assert(query != nullptr);
+
     std::wstringstream result;
-    std::wstring alias = query->dbSet->name.substr(0, 1) ;
+    std::wstring alias = query->dbSet->name.substr(0, 1);
 
     std::wstring select;
 
