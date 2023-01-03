@@ -12,7 +12,7 @@ int main() {
                        "entity Book { @Auto @PrimaryKey id: int; title: String; subTitle: String? author: Author }\n"
                        "entity Author { @PrimaryKey id: int; name: string ; books: Book[] }";
 
-    auto schema_text2 = L"database DbName {dbset<Book> books; dbset<Author> authors;}"
+    auto schema_text2 = "database DbName {dbset<Book> books; dbset<Author> authors;}"
                         "entity Book { @Auto @PrimaryKey id: int; title: string; subTitle: string; author: Author; authorId: int; }"
                         "entity Author { id: int; name: string;}"
                         ;
@@ -44,10 +44,10 @@ int main() {
 
     DbContext* dbContext = buildResult.dbContext;
 
-    std::wcout << "This is Db Schema: " << std::endl;
-    std::wcout << dbContext->schema->database->toString() << std::endl;
+    std::cout << "This is Db Schema: " << std::endl;
+    std::cout << dbContext->schema->database->toString() << std::endl;
 
-    QueryResult queryResult = dbContext->toSQL(L"from b in books;");
-    std::wcout << "Query: " << queryResult.sql << std::endl;
+    QueryResult queryResult = dbContext->toSQL("from b in books;");
+    std::cout << "Query: " << queryResult.sql << std::endl;
     return 0;
 }

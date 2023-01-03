@@ -12,22 +12,22 @@
 
 class Database {
 public:
-    std::wstring name;
-    std::map<std::wstring, DbSet*> dbSets;
+    std::string name;
+    std::map<std::string, DbSet*> dbSets;
 
 
-    bool hasDbSet(const std::wstring& dbSetName) {
+    bool hasDbSet(const std::string& dbSetName) {
         return dbSets.find(dbSetName) != dbSets.end();
     }
 
-    std::wstring toString() {
-        std::wstring value = L"database " + name + L" {\n";
+    std::string toString() {
+        std::string value = "database " + name + " {\n";
 
         for(auto &set: dbSets) {
-            value.append(L"    " + set.second->toString() + L"\n");
+            value.append("    " + set.second->toString() + "\n");
         }
 
-        value.append(L"}");
+        value.append("}");
 
         return value;
     }

@@ -9,18 +9,18 @@
 #include "parser/Tokenizer.hpp"
 #include "parser/SchemaTreeBuilder.hpp"
 
-DbContextCreateResult DbContext::create(std::wstring schema) {
-    std::wcout << schema << std::endl;
+DbContextCreateResult DbContext::create(std::string schema) {
+    std::cout << schema << std::endl;
     Tokenizer tokenizer = Tokenizer::create(std::move(schema));
 
     auto tokens = tokenizer.tokenize();
 
-    std::wcout << "Schema tokenized." << std::endl;
+    std::cout << "Schema tokenized." << std::endl;
 
     SchemaTreeBuilder schemaBuilder = SchemaTreeBuilder::create(&tokens);
     schemaBuilder.build();
 
-    std::wcout << "Schema built." << std::endl;
+    std::cout << "Schema built." << std::endl;
     auto* dbContext = new DbContext();
     dbContext->schema = schemaBuilder.schema();
 
@@ -30,7 +30,7 @@ DbContextCreateResult DbContext::create(std::wstring schema) {
     return result;
 }
 
-QueryResult DbContext::toSQL(std::wstring queryText) {
+QueryResult DbContext::toSQL(std::string queryText) {
     QueryBuilder builder = QueryBuilder::create(schema, std::move(queryText));
     builder.parse();
 
@@ -42,7 +42,7 @@ QueryResult DbContext::toSQL(std::wstring queryText) {
     return queryResult;
 }
 
-QueryResult DbContext::query(std::wstring queryText) {
+QueryResult DbContext::query(std::string queryText) {
     QueryBuilder builder = QueryBuilder::create(schema, std::move(queryText));
     builder.parse();
 

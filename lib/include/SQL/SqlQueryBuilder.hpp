@@ -10,7 +10,7 @@
 
 class SQLQueryBuilder {
 public:
-    std::wstring build(Query* query);
+    std::string build(Query* query);
 
     static SQLQueryBuilder create() {
         return SQLQueryBuilder();

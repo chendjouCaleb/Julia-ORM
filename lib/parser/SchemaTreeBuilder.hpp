@@ -8,6 +8,7 @@
 
 #include <schema/Schema.hpp>
 #include <schema/DbSet.hpp>
+#include <schema/TypeBlock.hpp>
 #include "Token.hpp"
 #include "../tools/Iterator.hpp"
 
@@ -29,6 +30,8 @@ public:
     Entity* takeEntity();
     Field* takeField();
     DbSet* takeDbSet();
+    Interface* takeInterface();
+    TypeBlock takeBlock();
 
     Annotation* takeAnnotation();
     std::vector<Annotation*> takeAnnotations();

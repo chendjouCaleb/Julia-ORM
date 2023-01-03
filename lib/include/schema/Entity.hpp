@@ -11,17 +11,17 @@
 
 class Entity {
 public:
-    std::wstring name;
+    std::string name;
     std::vector<Field*> fields;
 
-    std::wstring toString() {
-        std::wstring value = L"entity " + name + L" {\n";
+    std::string toString() {
+        std::string value = "entity " + name + " {\n";
 
         for(auto field: fields) {
-            value.append(L"    " + field->toString() + L"\n");
+            value.append("    " + field->toString() + "\n");
         }
 
-        value.append(L"}");
+        value.append("}");
 
         return value;
     }

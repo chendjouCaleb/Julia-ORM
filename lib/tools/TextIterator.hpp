@@ -11,17 +11,17 @@
 
 class TextIterator {
 private:
-    std::wstring _text;
+    std::string _text;
     size_t _index = 0;
     size_t _row = 0;
     size_t _col = 0;
 
 public:
-    static TextIterator create(const std::wstring& value);
+    static TextIterator create(const std::string& value);
 
-    explicit TextIterator(std::wstring value);
+    explicit TextIterator(std::string value);
 
-    std::wstring text();
+    std::string text();
 
     void next();
 
@@ -39,14 +39,13 @@ public:
     bool has();
 
     bool is(char c);
-    bool is_t(wchar_t t);
     bool isNot(char c);
 
-    void skipIfIs(wchar_t t);
+    void skipIfIs(char t);
 
     TextIndex textIndex() const;
 
-    bool isIn(std::wstring c);
+    bool isIn(std::string c);
 };
 
 

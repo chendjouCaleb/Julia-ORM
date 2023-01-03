@@ -7,26 +7,26 @@
 #include <sstream>
 #include <algorithm>
 
-std::wstring SQLQueryBuilder::build(Query *query) {
+std::string SQLQueryBuilder::build(Query *query) {
     assert(query != nullptr);
 
-    std::wstringstream result;
-    std::wstring alias = query->dbSet->name.substr(0, 1);
+    std::stringstream result;
+    std::string alias = query->dbSet->name.substr(0, 1);
 
-    std::wstring select;
+    std::string select;
 
     auto fields = query->dbSet->entity->fields;
-    std::wcout << "Alias: " << alias << std::endl;
-    std::wcout << "Fields count: " << fields.size() << alias << std::endl;
+    std::cout << "Alias: " << alias << std::endl;
+    std::cout << "Fields count: " << fields.size() << alias << std::endl;
 
     for (int i = 0; i < fields.size(); ++i) {
-        select += alias + L"." + fields[i]->name;
+        select += alias + "." + fields[i]->name;
         if(i < fields.size() -1 ) {
-            select += L", ";
+            select += ", ";
         }
     }
 
-    result << L"SELECT " + select + L" FROM " << query->dbSet->entity->name + L" AS " + alias;
+    result << "SELECT " + select + " FROM " << query->dbSet->entity->name + " AS " + alias;
 
     return result.str();
 }

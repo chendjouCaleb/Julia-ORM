@@ -52,11 +52,11 @@ class Token {
 public:
     TextIndex index;
     TokenKind kind;
+    std::string value;
+
+    Token(const TextIndex index, const std::string &value, TokenKind kind) : index(index), value(value), kind(kind) {}
 
 
-    Token(const TextIndex index, const std::wstring &value, TokenKind kind) : index(index), value(value), kind(kind) {}
-
-    std::wstring value;
 };
 
 #endif //JULIA_ORM_TOKEN_HPP

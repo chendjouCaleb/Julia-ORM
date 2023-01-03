@@ -18,7 +18,7 @@ private:
 public:
     Tokenizer(TextIterator it, std::vector<Token *> tokens);
 
-    static Tokenizer create(std::wstring text);
+    static Tokenizer create(std::string text);
 
     std::vector<Token *> getTokens() const;
 

@@ -24,22 +24,21 @@ enum QueryKind {
 class Query {
 public:
     QueryKind kind;
-    std::wstring statement;
-    std::wstring dbSetName;
-    std::wstring alias;
+    std::string statement;
+    std::string dbSetName;
+    std::string alias;
     std::map<Entity*, std::string> aliases;
 
     DbSet* dbSet;
     std::vector<QueryInclude*> includes;
 
-    std::wstring toString() const {
-        std::wstring value = L"from ";
-        //assert(dbSet != nullptr, "dbSet cannot be null.");
+    [[nodiscard]] std::string toString() const {
+        assert(dbSet != nullptr);
 
-        std::wcout << (dbSet == nullptr) << std::endl;
-        value += alias + L" in " + dbSet->name ;
+        std::string value = "from ";
+        value += alias + " in " + dbSet->name ;
 
-        value += L";";
+        value += ";";
 
         return value;
     }

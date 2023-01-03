@@ -15,7 +15,7 @@
 struct QueryResult {
     Query query;
     Query* query_ptr;
-    std::wstring sql;
+    std::string sql;
     std::vector<Error> errors;
 };
 
@@ -30,7 +30,7 @@ public:
 public:
     QueryBuilder(DbSchema *schema, std::vector<Token*> tokens);
 
-    static QueryBuilder create(DbSchema *schema, std::wstring);
+    static QueryBuilder create(DbSchema *schema, std::string);
 
     void parse();
 

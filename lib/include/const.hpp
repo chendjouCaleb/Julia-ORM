@@ -7,9 +7,9 @@
 
 #include <string>
 
-const wchar_t WHITE_SPACES[] = {' ', '\n', '\r', '\t', '\0'};
-const wchar_t SYMBOL_OPERATORS[] = {'-', '+', '/', '*', '.', '<', '>', '='};
-const std::wstring S_SYMBOL_OPERATORS = L"-+/*.<>=";
+const char WHITE_SPACES[] = {' ', '\n', '\r', '\t', '\0'};
+const char SYMBOL_OPERATORS[] = {'-', '+', '/', '*', '.', '<', '>', '='};
+const std::string S_SYMBOL_OPERATORS = "-+/*.<>=";
 
 
 

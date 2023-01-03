@@ -9,12 +9,12 @@
 
 class DbSet {
 public:
-    std::wstring name;
-    std::wstring entityName;
+    std::string name;
+    std::string entityName;
     Entity* entity;
 
-    [[nodiscard]] std::wstring toString() const {
-        return L"dbset<" + entityName + L"> " + name + L";";
+    [[nodiscard]] std::string toString() const {
+        return "dbset<" + entityName + "> " + name + ";";
     }
 };
 

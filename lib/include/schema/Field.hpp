@@ -13,25 +13,26 @@ enum FieldType {
     FT_INT,
     FT_DOUBLE,
     FT_STRING,
-    FT_CHAR
+    FT_CHAR,
+    FT_BOOLEAN
 };
 
 class Field {
 public:
-    std::wstring name;
-    std::wstring typeName;
+    std::string name;
+    std::string typeName;
     FieldType basicType;
 
     std::vector<Annotation*> annotations;
 
-    [[nodiscard]] std::wstring toString() const {
-        std::wstring value;
+    [[nodiscard]] std::string toString() const {
+        std::string value;
 
         for (auto annotation: annotations) {
-            value += annotation->toString() + L" ";
+            value += annotation->toString() + " ";
         }
 
-        return value + name + L": " + typeName + L";";
+        return value + name + ": " + typeName + ";";
     }
 };
 

@@ -30,7 +30,7 @@ class Error {
     SchemaErrorCode code;
     QueryErrorCode queryErrorCode;
     SyntaxErrorCode syntaxErrorCode;
-    std::wstring message;
+    std::string message;
 };
 
 

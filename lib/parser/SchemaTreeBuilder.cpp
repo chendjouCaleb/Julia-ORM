@@ -2,6 +2,7 @@
 // Created by HP on 19/12/2022.
 //
 
+#include <cassert>
 #include "SchemaTreeBuilder.hpp"
 
 
@@ -13,11 +14,11 @@ SchemaTreeBuilder SchemaTreeBuilder::create(std::vector<Token *> *tokens) {
 void SchemaTreeBuilder::build() {
     _schema = new DbSchema();
     while (_it.has()) {
-        if (_it.current()->kind == Tk_Word && _it.current()->value == L"database") {
+        if (_it.current()->kind == Tk_Word && _it.current()->value == "database") {
             takeDatabase();
         }
 
-        if (_it.current()->kind == Tk_Word && _it.current()->value == L"entity") {
+        if (_it.current()->kind == Tk_Word && _it.current()->value == "entity") {
             auto entity = takeEntity();
             _schema->entities.push_back(entity);
         }
@@ -44,7 +45,7 @@ void SchemaTreeBuilder::takeDatabase() {
     }
     _it.next();
 
-    while (_it.has() && _it.current()->kind == Tk_Word && _it.current()->value == L"dbset") {
+    while (_it.has() && _it.current()->kind == Tk_Word && _it.current()->value == "dbset") {
         //std::wcout << _it.current()->value << std::endl;
         auto dbSet = takeDbSet();
         db->dbSets[dbSet->name] = dbSet;
@@ -65,7 +66,7 @@ DbSet *SchemaTreeBuilder::takeDbSet() {
     _it.next();
     auto dbSet = new DbSet();
 
-    if (!_it.has() || _it.current()->kind != Tk_SymbolOperator || _it.current()->value != L"<") {
+    if (!_it.has() || _it.current()->kind != Tk_SymbolOperator || _it.current()->value != "<") {
         // Expect chevron open.
     }
 
@@ -78,7 +79,7 @@ DbSet *SchemaTreeBuilder::takeDbSet() {
     dbSet->entityName = _it.current()->value;
     _it.next();
 
-    if (!_it.has() || _it.current()->kind != Tk_SymbolOperator || _it.current()->value != L">") {
+    if (!_it.has() || _it.current()->kind != Tk_SymbolOperator || _it.current()->value != ">") {
         // Expect chevron close.
     }
     _it.next();
@@ -96,32 +97,75 @@ DbSet *SchemaTreeBuilder::takeDbSet() {
     return dbSet;
 }
 
-Entity *SchemaTreeBuilder::takeEntity() {
-    // skip entity keyword.
-    auto entity = new Entity();
-    _it.next();
-    if (!_it.has() || _it.current()->kind != Tk_Word) {
-        // Expect entity name
-    }
-    entity->name = _it.current()->value;
+Interface* SchemaTreeBuilder::takeInterface() {
+    auto interface = new Interface();
+
+    return interface;
+}
+
+TypeBlock SchemaTreeBuilder::takeBlock() {
+    assert(_it.current()->kind == Tk_Word);
+
+    auto block = TypeBlock {};
+    block.name = _it.current()->value;
     _it.next();
 
     if (!_it.has() || _it.current()->kind != Tk_BraceOpen) {
         // Expect brace open.
+        assert(_it.has() && _it.current()->kind == Tk_BraceOpen);
     }
     _it.next();
 
     while (_it.has() && _it.current()->kind != Tk_BraceClose) {
         auto field = takeField();
-        entity->fields.push_back(field);
+        block.fields.push_back(field);
     }
 
     if (!_it.has() || _it.current()->kind != Tk_BraceClose) {
         // Expect brace close.
+        assert(_it.has() && _it.current()->kind == Tk_BraceClose);
     }
     _it.next();
 
+    return block;
+}
+Entity *SchemaTreeBuilder::takeEntity() {
+    // skip entity keyword.
+    _it.next();
+    TypeBlock block = takeBlock();
+
+    auto* entity = new Entity();
+    entity->name = block.name;
+    entity->fields = block.fields;
+
     return entity;
+}
+void takeEntity1() {
+//    // skip entity keyword.
+//    auto entity = new Entity();
+//    _it.next();
+//    if (!_it.has() || _it.current()->kind != Tk_Word) {
+//        // Expect entity name
+//    }
+//    entity->name = _it.current()->value;
+//    _it.next();
+//
+//    if (!_it.has() || _it.current()->kind != Tk_BraceOpen) {
+//        // Expect brace open.
+//    }
+//    _it.next();
+//
+//    while (_it.has() && _it.current()->kind != Tk_BraceClose) {
+//        auto field = takeField();
+//        entity->fields.push_back(field);
+//    }
+//
+//    if (!_it.has() || _it.current()->kind != Tk_BraceClose) {
+//        // Expect brace close.
+//    }
+//    _it.next();
+//
+//    return entity;
 }
 
 Field *SchemaTreeBuilder::takeField() {
@@ -131,7 +175,7 @@ Field *SchemaTreeBuilder::takeField() {
     field->name = _it.current()->value;
     _it.next();
 
-    if (!_it.has() || _it.current()->value != L":") {
+    if (!_it.has() || _it.current()->value != ":") {
         // Expect : close.
     }
     _it.next();

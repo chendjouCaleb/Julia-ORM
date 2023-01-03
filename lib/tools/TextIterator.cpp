@@ -6,16 +6,16 @@
 
 #include <utility>
 
-TextIterator TextIterator::create(const std::wstring& value) {
+TextIterator TextIterator::create(const std::string& value) {
     TextIterator it = TextIterator(value);
     return it;
 }
 
-std::wstring TextIterator::text() {
+std::string TextIterator::text() {
     return _text;
 }
 
-TextIterator::TextIterator(std::wstring value) {
+TextIterator::TextIterator(std::string value) {
     _text = std::move(value);
 }
 
@@ -40,16 +40,13 @@ bool TextIterator::is(char c) {
     return has() && current() == c;
 }
 
-bool TextIterator::is_t(wchar_t t) {
-    return current() == t;
-}
 
 bool TextIterator::isNot(char c) {
     return has() && current() != c;
 }
 
-void TextIterator::skipIfIs(wchar_t t) {
-    if(is_t(t)) {
+void TextIterator::skipIfIs(char t) {
+    if(is(t)) {
         next();
     }
 }
@@ -59,7 +56,7 @@ void TextIterator::skipIfIs(wchar_t t) {
  * @param text The provided string.
  * @return True if the current is in the provided string.
  */
-bool TextIterator::isIn(std::wstring text) {
+bool TextIterator::isIn(std::string text) {
     return has() && text.find(current()) < text.length();
 }
 
@@ -105,7 +102,7 @@ wchar_t TextIterator::t() {
  * @return
  */
 bool TextIterator::isWhiteSpace() {
-    std::wstring text = L"\u0009\u000A\u000C\u000D\u0020";
+    std::string text = "\u0009\u000A\u000C\u000D\u0020";
     return has() && text.find(current()) < text.length();
 }
 

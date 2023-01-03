@@ -13,7 +13,7 @@ QueryBuilder::QueryBuilder(DbSchema *schema, std::vector<Token *> tokens) : sche
     _it = Iterator<Token *>(&tokens);
 }
 
-QueryBuilder QueryBuilder::create(DbSchema *schema, std::wstring text) {
+QueryBuilder QueryBuilder::create(DbSchema *schema, std::string text) {
     Tokenizer tokenizer = Tokenizer::create(std::move(text));
     auto tokens = tokenizer.tokenize();
     return QueryBuilder{schema, tokens};
@@ -22,7 +22,7 @@ QueryBuilder QueryBuilder::create(DbSchema *schema, std::wstring text) {
 
 void QueryBuilder::parse() {
     while (_it.has()) {
-        if (_it.current()->kind == Tk_Word && _it.current()->value == L"from") {
+        if (_it.current()->kind == Tk_Word && _it.current()->value == "from") {
 
             takeSelect();
             if (_it.current()->kind == Tk_SemiColon) {
@@ -51,7 +51,7 @@ void QueryBuilder::takeSelect() {
     }
     query.alias = _it.current()->value;
     _it.next();
-    if (!_it.has() || _it.current()->kind != Tk_Word || _it.current()->value != L"in") {
+    if (!_it.has() || _it.current()->kind != Tk_Word || _it.current()->value != "in") {
         // Expect 'in' keyword.
     }
     _it.next();

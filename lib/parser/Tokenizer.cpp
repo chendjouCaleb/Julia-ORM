@@ -8,7 +8,7 @@
 #include "Tokenizer.hpp"
 
 
-Tokenizer Tokenizer::create(std::wstring text) {
+Tokenizer Tokenizer::create(std::string text) {
     auto tokenizer = Tokenizer(TextIterator(std::move(text)), {});
     return tokenizer;
 }
@@ -28,7 +28,7 @@ std::vector<Token *> Tokenizer::tokenize() {
         } else if (SINGLE_SYMBOLS.find(_it.current()) != SINGLE_SYMBOLS.end()) {
             take_single_char(_it.current(), SINGLE_SYMBOLS.find(_it.current())->second);
         }else {
-            throw "Unknown char";
+            throw std::invalid_argument("Unknown char");
         }
     }
     return tokens;
@@ -36,7 +36,7 @@ std::vector<Token *> Tokenizer::tokenize() {
 
 void Tokenizer::take_word() {
     auto index = _it.textIndex();
-    std::wstring value;
+    std::string value;
 
     while (_it.has() && is_word_char()) {
         value.push_back(_it.current());
@@ -48,7 +48,7 @@ void Tokenizer::take_word() {
 
 void Tokenizer::take_number() {
     auto index = _it.textIndex();
-    std::wstring value;
+    std::string value;
 
     while (_it.has() && _it.isDigit()) {
         value.push_back(_it.current());
@@ -61,7 +61,7 @@ void Tokenizer::take_number() {
 
 void Tokenizer::take_operator_symbol() {
     auto index = _it.textIndex();
-    std::wstring value;
+    std::string value;
     while (_it.has() && _it.isIn(S_SYMBOL_OPERATORS)) {
         value.push_back(_it.current());
         _it.next();
@@ -74,7 +74,7 @@ void Tokenizer::take_operator_symbol() {
 void Tokenizer::take_single_char(wchar_t value, TokenKind kind) {
     if (_it.has() && _it.current() == value) {
         auto index = _it.textIndex();
-        std::wstring value(1, _it.current());
+        std::string value(1, _it.current());
         auto token = new Token(index, value, kind);
         _it.next();
         tokens.push_back(token);

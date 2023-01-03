@@ -28,11 +28,11 @@ class DbContext {
 public:
     DbSchema* schema;
 
-    static DbContextCreateResult create(std::wstring schema);
+    static DbContextCreateResult create(std::string schema);
     static void destroy(DbContext* context);
 
-    QueryResult toSQL(std::wstring text);
-    QueryResult query(std::wstring text);
+    QueryResult toSQL(std::string text);
+    QueryResult query(std::string text);
 };
 
 #endif //JULIA_ORM_DBCONTEXT_HPP
