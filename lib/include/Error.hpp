@@ -12,24 +12,27 @@ enum ErrorType {
 };
 
 enum SyntaxErrorCode {
-    SYNTAX_ERR_UNEXPECTED_CHAR = 0,
-    SYNTAX_ERR_UNEXPECTED_TOKEN = 1,
+    SYNTAX_ERR_EMPTY = 0,
+    SYNTAX_ERR_UNEXPECTED_CHAR,
+    SYNTAX_ERR_UNEXPECTED_TOKEN
 };
 
 enum QueryErrorCode {
-    QUERY_ERR_UNEXPECTED_CHAR = 0,
-    QUERY_ERR_UNEXPECTED_TOKEN = 1,
+    QUERY_ERR_UNEXPECTED_EMPTY = 0,
+    QUERY_ERR_UNEXPECTED_CHAR,
+    QUERY_ERR_UNEXPECTED_TOKEN
 };
 
 enum SchemaErrorCode {
-    SCHEMA_ERR_UNKNOWN_DB_SET = 1,
+    SCHEMA_ERR_UNKNOWN_EMPTY = 0,
+    SCHEMA_ERR_UNKNOWN_DB_SET,
 };
 
-class Error {
+struct Error {
     ErrorType type;
-    SchemaErrorCode code;
-    QueryErrorCode queryErrorCode;
-    SyntaxErrorCode syntaxErrorCode;
+    SchemaErrorCode code = SCHEMA_ERR_UNKNOWN_EMPTY;
+    QueryErrorCode queryErrorCode = QUERY_ERR_UNEXPECTED_EMPTY;
+    SyntaxErrorCode syntaxErrorCode = SYNTAX_ERR_EMPTY;
     std::string message;
 };
 

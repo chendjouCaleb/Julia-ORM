@@ -1,4 +1,5 @@
 #include <iostream>
+#include <windows.h>
 #include <DbContext.hpp>
 #include "lib/parser/Tokenizer.hpp"
 #include "lib/parser/SchemaTreeBuilder.hpp"
@@ -12,10 +13,10 @@ int main() {
                        "entity Book { @Auto @PrimaryKey id: int; title: String; subTitle: String? author: Author }\n"
                        "entity Author { @PrimaryKey id: int; name: string ; books: Book[] }";
 
-    auto schema_text2 = "database DbName {dbset<Book> books; dbset<Author> authors;}"
-                        "interface Author { id: int; name: string;}"
-                        "entity Book { @Auto @PrimaryKey id: int; title: string; subTitle: string; author: Author; authorId: int; }"
-                        "entity Author { id: int; name: string;}"
+    std::string schema_text2 = R"(database DbName {dbset<Book> books; dbset<Author> authors;})"
+                       R"(interface Author { id: int; name: string;}^)"
+                       R"(entity Book { @Auto @PrimaryKey id: int; title: string; subTitle: string; author: Author; authorId: int; })"
+                       R"(entity Author { id: int; name: string;})"
                         ;
 //    float a = .8;
 //    Tokenizer tokenizer = Tokenizer::create(schema_text2);
@@ -41,7 +42,22 @@ int main() {
 //        std::wcout << entity->toString() << std::endl;
 //    }
 
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     DbContextCreateResult buildResult = DbContext::create(schema_text2);
+
+    if(!buildResult.isSuccess()) {
+        SetConsoleTextAttribute(hConsole, 12);
+        std::cout << buildResult.syntaxErrors.size() << " errors in your db schema." << std::endl;
+        for (auto error : buildResult.syntaxErrors) {
+            std::cout << "    > " << error.message << std::endl;
+        }
+
+        return 0;
+    } else {
+        SetConsoleTextAttribute(hConsole, 10);
+        std::cout << "Your db schema is ok!" << std::endl;
+        SetConsoleTextAttribute(hConsole, 7);
+    }
 
     DbContext* dbContext = buildResult.dbContext;
 

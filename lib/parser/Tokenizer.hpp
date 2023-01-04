@@ -7,6 +7,7 @@
 
 
 #include <vector>
+#include <Error.hpp>
 #include "../tools/TextIterator.hpp"
 #include "Token.hpp"
 
@@ -14,6 +15,9 @@ class Tokenizer {
 private:
     TextIterator _it;
     std::vector<Token*> tokens;
+
+public:
+    std::vector<Error> errors;
 
 public:
     Tokenizer(TextIterator it, std::vector<Token *> tokens);
@@ -32,7 +36,9 @@ public:
 
     void skip_white_space();
 
-    void take_single_char(wchar_t value, TokenKind kind);
+    void take_single_char(char value, TokenKind kind);
+
+    void take_unknown_token_error();
 
     bool is_word_start();
 

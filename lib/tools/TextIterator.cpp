@@ -5,6 +5,7 @@
 #include "TextIterator.hpp"
 
 #include <utility>
+#include <cassert>
 
 TextIterator TextIterator::create(const std::string& value) {
     TextIterator it = TextIterator(value);
@@ -20,14 +21,13 @@ TextIterator::TextIterator(std::string value) {
 }
 
 void TextIterator::next() {
-    if (!has()) {
-        return;
-    }
+    assert(has());
+
     if (current() == '\n') {
         _row += 1;
         _col = 0;
     } else {
-        _row += 1;
+        _col += 1;
     }
     _index++;
 }
@@ -83,16 +83,11 @@ bool TextIterator::isLetter() {
  * Gets the current char.
  * @return
  */
-wchar_t TextIterator::current() {
+char TextIterator::current() {
     if (has()) {
         return _text[_index];
     }
     return '\0';
-}
-
-
-wchar_t TextIterator::t() {
-    return current();
 }
 
 

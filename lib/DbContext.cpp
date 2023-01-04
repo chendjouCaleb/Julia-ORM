@@ -10,10 +10,14 @@
 #include "parser/SchemaTreeBuilder.hpp"
 
 DbContextCreateResult DbContext::create(std::string schema) {
-    std::cout << schema << std::endl;
+    DbContextCreateResult result = DbContextCreateResult {};
     Tokenizer tokenizer = Tokenizer::create(std::move(schema));
 
     auto tokens = tokenizer.tokenize();
+    if(!tokenizer.errors.empty()) {
+        result.syntaxErrors = tokenizer.errors;
+        return result;
+    }
 
     std::cout << "Schema tokenized." << std::endl;
 
@@ -24,7 +28,7 @@ DbContextCreateResult DbContext::create(std::string schema) {
     auto* dbContext = new DbContext();
     dbContext->schema = schemaBuilder.schema();
 
-    DbContextCreateResult result = DbContextCreateResult {};
+
     result.dbContext = dbContext;
 
     return result;

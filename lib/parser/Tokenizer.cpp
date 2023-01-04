@@ -27,8 +27,8 @@ std::vector<Token *> Tokenizer::tokenize() {
             take_operator_symbol();
         } else if (SINGLE_SYMBOLS.find(_it.current()) != SINGLE_SYMBOLS.end()) {
             take_single_char(_it.current(), SINGLE_SYMBOLS.find(_it.current())->second);
-        }else {
-            throw std::invalid_argument("Unknown char");
+        } else {
+            take_unknown_token_error();
         }
     }
     return tokens;
@@ -71,14 +71,27 @@ void Tokenizer::take_operator_symbol() {
 }
 
 
-void Tokenizer::take_single_char(wchar_t value, TokenKind kind) {
+void Tokenizer::take_single_char(char value, TokenKind kind) {
     if (_it.has() && _it.current() == value) {
         auto index = _it.textIndex();
-        std::string value(1, _it.current());
-        auto token = new Token(index, value, kind);
+        std::string str(1, _it.current());
+        auto token = new Token(index, str, kind);
         _it.next();
         tokens.push_back(token);
     }
+}
+
+void Tokenizer::take_unknown_token_error() {
+    std::string token(1, _it.current());
+    auto index = _it.textIndex();
+    Error error = Error {
+        .type = ERR_TYPE_SYNTAX,
+        .syntaxErrorCode = SYNTAX_ERR_UNEXPECTED_CHAR,
+        .message = "Unknown character '" + token + "' at ["+ std::to_string(index.row()) + ", " + std::to_string(index.col()) + "].",
+    };
+
+    errors.push_back(error);
+    _it.next();
 }
 
 void Tokenizer::skip_white_space() {
@@ -101,4 +114,5 @@ bool Tokenizer::is_word_start() {
 std::vector<Token *> Tokenizer::getTokens() const {
     return tokens;
 }
+
 

@@ -33,8 +33,7 @@ public:
 
     void skipWhiteSpace();
 
-    wchar_t current();
-    wchar_t t();
+    char current();
 
     bool has();
 
