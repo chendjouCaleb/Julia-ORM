@@ -82,12 +82,16 @@ void Tokenizer::take_single_char(char value, TokenKind kind) {
 }
 
 void Tokenizer::take_unknown_token_error() {
-    std::string token(1, _it.current());
+    char token = _it.current();
     auto index = _it.textIndex();
+
+    char msgBuffer[100];
+    snprintf(msgBuffer, sizeof(msgBuffer), "Unknown character '%c' at [%d, %d].", token, index.row(), index.col());
+    std::string message = msgBuffer;
     Error error = Error {
         .type = ERR_TYPE_SYNTAX,
         .syntaxErrorCode = SYNTAX_ERR_UNEXPECTED_CHAR,
-        .message = "Unknown character '" + token + "' at ["+ std::to_string(index.row()) + ", " + std::to_string(index.col()) + "].",
+        .message = message
     };
 
     errors.push_back(error);
