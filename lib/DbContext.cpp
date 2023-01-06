@@ -2,7 +2,7 @@
 // Created by HP on 27/12/2022.
 //
 
-#include "DbContext.hpp"
+#include "julia_orm/DbContext.hpp"
 
 #include <utility>
 #include <SQL/SqlQueryBuilder.hpp>
@@ -23,6 +23,11 @@ DbContextCreateResult DbContext::create(std::string schema) {
 
     SchemaTreeBuilder schemaBuilder = SchemaTreeBuilder::create(&tokens);
     schemaBuilder.build();
+
+    if(!schemaBuilder.syntaxErrors.empty()) {
+        result.syntaxErrors = schemaBuilder.syntaxErrors;
+        return result;
+    }
 
     std::cout << "Schema built." << std::endl;
     auto* dbContext = new DbContext();

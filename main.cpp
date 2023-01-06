@@ -1,6 +1,6 @@
 #include <iostream>
 #include <windows.h>
-#include <DbContext.hpp>
+#include <julia_orm/DbContext.hpp>
 #include "lib/parser/Tokenizer.hpp"
 #include "lib/parser/SchemaTreeBuilder.hpp"
 
@@ -13,10 +13,11 @@ int main() {
                        "entity Book { @Auto @PrimaryKey id: int; title: String; subTitle: String? author: Author }\n"
                        "entity Author { @PrimaryKey id: int; name: string ; books: Book[] }";
 
-    std::string schema_text2 = R"(database DbName {dbset<Book> books; dbset<Author> authors;})"
-                       R"(interface Author { id: int; name: string;}^)"
-                       R"(entity Book { @Auto @PrimaryKey id: int; title: string; subTitle: string; author: Author; authorId: int; })"
-                       R"(entity Author { id: int; name: string;})"
+    std::string schema_text2 = R"(
+                        database DbName {dbset<Book> books; dbset<Author> authors;}
+                       interface PrimaryKey { id: int; name: string;}
+                       entity { @Auto @PrimaryKey id: int; title: string; subTitle: string; author: Author; authorId: int; }
+                       entity Author { id: int; name: string;})"
                         ;
 //    float a = .8;
 //    Tokenizer tokenizer = Tokenizer::create(schema_text2);

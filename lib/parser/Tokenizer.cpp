@@ -5,6 +5,7 @@
 #include <const.hpp>
 #include <utility>
 #include <vector>
+#include <fmt/format.h>
 #include "Tokenizer.hpp"
 
 
@@ -85,13 +86,10 @@ void Tokenizer::take_unknown_token_error() {
     char token = _it.current();
     auto index = _it.textIndex();
 
-    char msgBuffer[100];
-    snprintf(msgBuffer, sizeof(msgBuffer), "Unknown character '%c' at [%d, %d].", token, index.row(), index.col());
-    std::string message = msgBuffer;
     Error error = Error {
         .type = ERR_TYPE_SYNTAX,
         .syntaxErrorCode = SYNTAX_ERR_UNEXPECTED_CHAR,
-        .message = message
+        .message = fmt::format("Unknown character '{}' at [{}, {}].", token, index.row(), index.col())
     };
 
     errors.push_back(error);

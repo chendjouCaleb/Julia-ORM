@@ -5,6 +5,7 @@
 #include "QueryBuilder.hpp"
 
 #include <utility>
+#include <fmt/format.h>
 #include "Tokenizer.hpp"
 
 
@@ -31,10 +32,7 @@ void QueryBuilder::parse() {
             }
         } else {
             auto value = _it.current()->value;
-            char tmp[255];
-            sprintf(tmp, "%ls", value.c_str());
-            std::string message = "Unknown token ";
-            message.push_back(*tmp);
+            std::string message = fmt::format("Unknown token {}.", value);
             throw std::invalid_argument(message);
         }
     }

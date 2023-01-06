@@ -8,7 +8,7 @@
 
 #include <schema/Schema.hpp>
 #include <query/Query.hpp>
-#include <Error.hpp>
+#include <julia_orm/Error.hpp>
 #include "Token.hpp"
 #include "../tools/Iterator.hpp"
 

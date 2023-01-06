@@ -7,7 +7,7 @@
 
 #include "schema/Schema.hpp"
 #include "Error.hpp"
-#include "../parser/QueryBuilder.hpp"
+#include "../../parser/QueryBuilder.hpp"
 
 typedef class DbContext DbContext;
 

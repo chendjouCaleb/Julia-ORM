@@ -3,6 +3,7 @@
 //
 
 #include <cassert>
+#include <fmt/format.h>
 #include "SchemaTreeBuilder.hpp"
 
 
@@ -17,16 +18,32 @@ void SchemaTreeBuilder::build() {
         if (_it.current()->kind == Tk_Word && _it.current()->value == "database") {
             takeDatabase();
         }
-
-        else if (_it.current()->kind == Tk_Word && _it.current()->value == "entity") {
-            auto entity = takeEntity();
-            _schema->entities.push_back(entity);
-        }
-
         else if (_it.current()->kind == Tk_Word && _it.current()->value == "interface") {
             auto interface = takeInterface();
             _schema->interfaces.push_back(interface);
         }
+
+        else if (_it.current()->kind == Tk_Word && _it.current()->value == "entity") {
+            auto entity = takeEntity();
+            _schema->entities.push_back(entity);
+        } else {
+            if(!syntaxErrors.empty()) {
+                break;
+            }
+
+            auto token = _it.current();
+            Error error = {
+                    .type = ERR_TYPE_SYNTAX,
+                    .syntaxErrorCode = SYNTAX_ERR_UNKNOWN_TOKEN,
+                    .message = fmt::format("Unknown token {} at [{}, {}]", token->value, token->index.row(), token->index.col())
+            };
+            syntaxErrors.push_back(error);
+            break;
+        }
+    }
+
+    if(!syntaxErrors.empty()){
+        return;
     }
 
     for (const auto &item : _schema->database->dbSets) {
@@ -37,11 +54,15 @@ void SchemaTreeBuilder::build() {
 
 void SchemaTreeBuilder::takeDatabase() {
     // skip database keyword.
-    auto db = new Database();
+    auto keywordToken = _it.current();
     _it.next();
+
     if (!_it.has() || _it.current()->kind != Tk_Word) {
-        // Expect db name
+        takeDatabaseNameError(keywordToken);
+        return;
     }
+
+    auto db = new Database();
     db->name = _it.current()->value;
     _it.next();
 
@@ -105,6 +126,16 @@ DbSet *SchemaTreeBuilder::takeDbSet() {
 Entity *SchemaTreeBuilder::takeEntity() {
     // skip entity keyword.
     _it.next();
+    auto keywordToken = _it.current();
+
+    if(!_it.has() || _it.current()->kind != Tk_Word) {
+        // Expect entity name.
+       Error error = takeEntityNameError(keywordToken);
+        std::cout << error.message << std::endl;
+        return nullptr;
+    }
+
+
     TypeBlock block = takeBlock();
 
     auto* entity = new Entity();
@@ -117,8 +148,15 @@ Entity *SchemaTreeBuilder::takeEntity() {
 Interface* SchemaTreeBuilder::takeInterface() {
     // skip interface keyword.
     _it.next();
-    TypeBlock block = takeBlock();
+    auto keywordToken = _it.current();
 
+    if(!_it.has() || _it.current()->kind != Tk_Word) {
+        // Expect interface name.
+        takeInterfaceNameError(keywordToken);
+        return nullptr;
+    }
+
+    TypeBlock block = takeBlock();
     auto interface = new Interface();
     interface->name = block.name;
     interface->fields = block.fields;
@@ -205,3 +243,37 @@ Annotation *SchemaTreeBuilder::takeAnnotation() {
     return annotation;
 }
 
+
+Error SchemaTreeBuilder::takeInterfaceNameError(Token* keywordToken) {
+    auto index = keywordToken->index;
+    Error error = Error {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_NO_TYPE_NAME,
+            .message = fmt::format("Expect interface name at [{}, {}].", index.row(), index.col())
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
+
+Error SchemaTreeBuilder::takeEntityNameError(Token* keywordToken) {
+    auto index = keywordToken->index;
+    Error error = Error {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_NO_TYPE_NAME,
+            .message = fmt::format("Expect entity name at [{}, {}].", index.row(), index.col())
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
+
+
+Error SchemaTreeBuilder::takeDatabaseNameError(Token* keywordToken) {
+    auto index = keywordToken->index;
+    Error error = Error {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_NO_TYPE_NAME,
+            .message = fmt::format("Expect database name at [{}, {}].", index.row(), index.col())
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
