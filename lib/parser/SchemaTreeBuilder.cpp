@@ -12,6 +12,10 @@ SchemaTreeBuilder SchemaTreeBuilder::create(std::vector<Token *> *tokens) {
     return builder;
 }
 
+bool SchemaTreeBuilder::hasError() {
+    return !(syntaxErrors.empty() && schemaErrors.empty());
+}
+
 void SchemaTreeBuilder::build() {
     _schema = new DbSchema();
     while (_it.has()) {
@@ -31,13 +35,7 @@ void SchemaTreeBuilder::build() {
                 break;
             }
 
-            auto token = _it.current();
-            Error error = {
-                    .type = ERR_TYPE_SYNTAX,
-                    .syntaxErrorCode = SYNTAX_ERR_UNKNOWN_TOKEN,
-                    .message = fmt::format("Unknown token {} at [{}, {}]", token->value, token->index.row(), token->index.col())
-            };
-            syntaxErrors.push_back(error);
+            takeUnknownTokenError(_it.current());
             break;
         }
     }
@@ -173,18 +171,28 @@ TypeBlock SchemaTreeBuilder::takeBlock() {
 
     if (!_it.has() || _it.current()->kind != Tk_BraceOpen) {
         // Expect brace open.
-        assert(_it.has() && _it.current()->kind == Tk_BraceOpen);
+        // assert(_it.has() && _it.current()->kind == Tk_BraceOpen);
+        takeBlockBraceOpenError(_it.current());
+        return block;
     }
     _it.next();
 
-    while (_it.has() && _it.current()->kind != Tk_BraceClose) {
+    while (_it.has() && syntaxErrors.empty() && _it.current()->kind != Tk_BraceClose) {
         auto field = takeField();
-        block.fields.push_back(field);
+        if(field != nullptr) {
+            block.fields.push_back(field);
+        }
+    }
+
+    if(hasError()) {
+        return block;
     }
 
     if (!_it.has() || _it.current()->kind != Tk_BraceClose) {
         // Expect brace close.
-        assert(_it.has() && _it.current()->kind == Tk_BraceClose);
+        //assert(_it.has() && _it.current()->kind == Tk_BraceClose);
+        takeBlockBraceCloseError(_it.current());
+        return block;
     }
     _it.next();
 
@@ -193,27 +201,44 @@ TypeBlock SchemaTreeBuilder::takeBlock() {
 
 
 Field *SchemaTreeBuilder::takeField() {
-    auto *field = new Field();
 
-    field->annotations = takeAnnotations();
-    field->name = _it.current()->value;
+
+    auto annotations = takeAnnotations();
+    if(!_it.has() || _it.current()->kind != Tk_Word) {
+        std::cout << fmt::format("Token: '{}', [{}, {}]", _it.current()->value, _it.current()->index.row(),_it.current()->index.col() ) << std::endl;
+        assert(_it.has() && _it.current()->kind == Tk_Word);
+        takeFieldNameError(_it.current());
+        return nullptr;
+    }
+    std::string name = _it.current()->value;
     _it.next();
 
     if (!_it.has() || _it.current()->value != ":") {
-        // Expect : close.
+        //assert(_it.has() && _it.current()->value == ":");
+        takeFieldColonError(_it.current());
+        return nullptr;
     }
     _it.next();
 
     if (!_it.has() || _it.current()->kind != Tk_Word) {
+        assert(_it.has() && _it.current()->kind == Tk_Word);
         // Expect entity name
     }
-    field->typeName = _it.current()->value;
+    std::string typeName = _it.current()->value;
     _it.next();
 
     if (!_it.has() || _it.current()->kind != Tk_SemiColon) {
         // Expect ;.
+       // assert(_it.has() && _it.current()->kind == Tk_SemiColon);
+        takeSemiColonError(_it.current());
+        return nullptr;
     }
     _it.next();
+
+    auto *field = new Field();
+    field->annotations = annotations;
+    field->name = name;
+    field->typeName = typeName;
 
     return field;
 }
@@ -273,6 +298,80 @@ Error SchemaTreeBuilder::takeDatabaseNameError(Token* keywordToken) {
             .type = ERR_TYPE_SYNTAX,
             .syntaxErrorCode = SYNTAX_ERR_NO_TYPE_NAME,
             .message = fmt::format("Expect database name at [{}, {}].", index.row(), index.col())
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
+
+Error SchemaTreeBuilder::takeUnknownTokenError(Token *token) {
+    Error error = {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_UNKNOWN_TOKEN,
+            .message = fmt::format("Unknown token '{}' at [{}, {}].", token->value, token->index.row(), token->index.col())
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
+
+Error SchemaTreeBuilder::takeBlockBraceOpenError(Token *token) {
+    Error error = {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_NO_OPEN_BRACE,
+            .message = fmt::format("Expect brace open at [{}, {}]", token->index.row(), token->index.col())
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
+
+
+Error SchemaTreeBuilder::takeBlockBraceCloseError(Token *token) {
+    Error error = {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_NO_CLOSE_BRACE,
+            .message = fmt::format("Expect brace close at [{}, {}].", token->index.row(), token->index.col())
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
+
+
+Error SchemaTreeBuilder::takeFieldNameError(Token* token) {
+    Error error = {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_NO_CLOSE_BRACE,
+            .message = fmt::format("Expect field name at [{}, {}].", token->index.row(), token->index.col())
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
+
+
+Error SchemaTreeBuilder::takeFieldColonError(Token* token) {
+    Error error = {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_NO_FIELD_COLON_TYPE,
+            .message = fmt::format("Expect colon ':' after field name  at [{}, {}].", token->index.row(), token->index.col())
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
+
+
+Error SchemaTreeBuilder::takeFieldTypeError(Token* token) {
+    Error error = {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_NO_FIELD_TYPE,
+            .message = fmt::format("Expect field type after ':' at [{}, {}].", token->index.row(), token->index.col())
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
+
+Error SchemaTreeBuilder::takeSemiColonError(Token* token) {
+    Error error = {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_NO_SEMI_COLON,
+            .message = fmt::format("Expect ';' at [{}, {}].", token->index.row(), token->index.col())
     };
     syntaxErrors.push_back(error);
     return error;

@@ -20,6 +20,7 @@ private:
 
 public:
     std::vector<Error> syntaxErrors;
+    std::vector<Error> schemaErrors;
 
 public:
     explicit SchemaTreeBuilder(Iterator<Token*> it) : _it(it), _schema(nullptr) {
@@ -29,6 +30,8 @@ public:
     static SchemaTreeBuilder create(std::vector<Token*>* tokens);
 
     void build();
+
+    bool hasError();
 
     void takeDatabase();
     Entity* takeEntity();
@@ -41,9 +44,17 @@ public:
     std::vector<Annotation*> takeAnnotations();
 
     Error takeInterfaceNameError(Token* lastToken);
-
     Error takeEntityNameError(Token* lastToken);
     Error takeDatabaseNameError(Token* lastToken);
+    Error takeBlockBraceOpenError(Token* token);
+    Error takeBlockBraceCloseError(Token* token);
+    Error takeUnknownTokenError(Token* token);
+
+    Error takeFieldNameError(Token* token);
+    Error takeFieldColonError(Token* token);
+    Error takeFieldTypeError(Token* token);
+
+    Error takeSemiColonError(Token* token);
 
     DbSchema* schema() {
         return _schema;
