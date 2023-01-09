@@ -72,8 +72,9 @@ void SchemaTreeBuilder::takeDatabase() {
     while (_it.has() && _it.current()->kind == Tk_Word && _it.current()->value == "dbset") {
         //std::wcout << _it.current()->value << std::endl;
         auto dbSet = takeDbSet();
-        db->dbSets[dbSet->name] = dbSet;
-
+        if(dbSet != nullptr) {
+            db->dbSets[dbSet->name] = dbSet;
+        }
 
     }
 
@@ -88,34 +89,43 @@ void SchemaTreeBuilder::takeDatabase() {
 DbSet *SchemaTreeBuilder::takeDbSet() {
     // Skip dbSet keyword.
     _it.next();
-    auto dbSet = new DbSet();
 
     if (!_it.has() || _it.current()->kind != Tk_SymbolOperator || _it.current()->value != "<") {
+       // assert(_it.has() && _it.current()->kind == Tk_SymbolOperator && _it.current()->value == "<");
+        takeDbSetTypeOpenError(_it.current());
+        return nullptr;
         // Expect chevron open.
     }
 
     _it.next();
 
     if (!_it.has() || _it.current()->kind != Tk_Word) {
+        takeDbSetTypeError(_it.current());
+        return nullptr;
         // Expect entity type name.
     }
-
-    dbSet->entityName = _it.current()->value;
+    std::string name = _it.current()->value;
     _it.next();
 
     if (!_it.has() || _it.current()->kind != Tk_SymbolOperator || _it.current()->value != ">") {
         // Expect chevron close.
+        takeDbSetTypeCloseError(_it.current());
     }
     _it.next();
 
+    auto dbSet = new DbSet();
+    dbSet->entityName = name;
+
+
     if (!_it.has() || _it.current()->kind != Tk_Word) {
         // Expect dbset name.
+        takeDbSetNameError(_it.current());
     }
     dbSet->name = _it.current()->value;
     _it.next();
     // std::wcout << _it.current()->value << std::endl;
     if (!_it.has() || _it.current()->kind != Tk_SemiColon) {
-        // Expect ;.
+        takeSemiColonError(_it.current());
     }
     _it.next();
     return dbSet;
@@ -220,12 +230,10 @@ Field *SchemaTreeBuilder::takeField() {
     }
     _it.next();
 
-    if (!_it.has() || _it.current()->kind != Tk_Word) {
-        assert(_it.has() && _it.current()->kind == Tk_Word);
-        // Expect entity name
+    TypeCall* typeCall = takeTypeCall();
+    if(typeCall == nullptr) {
+        return nullptr;
     }
-    std::string typeName = _it.current()->value;
-    _it.next();
 
     if (!_it.has() || _it.current()->kind != Tk_SemiColon) {
         // Expect ;.
@@ -238,9 +246,38 @@ Field *SchemaTreeBuilder::takeField() {
     auto *field = new Field();
     field->annotations = annotations;
     field->name = name;
-    field->typeName = typeName;
+    field->type = typeCall;
 
     return field;
+}
+
+TypeCall* SchemaTreeBuilder::takeTypeCall() {
+    if(!_it.has() || _it.current()->kind != Tk_Word) {
+        assert(_it.has() && _it.current()->kind == Tk_Word);
+        return nullptr;
+    }
+    std::string typeName = _it.current()->value;
+    bool  isArray = false;
+
+    // Skip current name;
+    _it.next();
+
+    if(_it.has() && _it.current()->kind == Tk_BracketOpen) {
+        isArray = true;
+        _it.next();
+
+        if(!_it.has() || _it.current()->kind != Tk_BracketClose) {
+            assert(_it.has() && _it.current()->kind == Tk_BracketClose);
+            return nullptr;
+        }
+        _it.next();
+    }
+
+    auto *typeCall = new TypeCall();
+    typeCall->isArray = isArray;
+    typeCall->typeName = typeName;
+
+    return typeCall;
 }
 
 
@@ -372,6 +409,61 @@ Error SchemaTreeBuilder::takeSemiColonError(Token* token) {
             .type = ERR_TYPE_SYNTAX,
             .syntaxErrorCode = SYNTAX_ERR_NO_SEMI_COLON,
             .message = fmt::format("Expect ';' at [{}, {}].", token->index.row(), token->index.col())
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
+
+Error SchemaTreeBuilder::takeTypeArrayCloseError(Token* token) {
+    Error error = {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_NO_SEMI_COLON,
+            .message = fmt::format("Expect ';' at [{}, {}].", token->index.row(), token->index.col())
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
+
+Error SchemaTreeBuilder::takeDbSetTypeOpenError(Token* token) {
+    auto message = fmt::format("Expect '<' to introduce dbset type. Error at [{}, {}].", token->index.row(), token->index.col());
+    Error error = {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_NO_DBSET_TYPE_OPEN,
+            .message = message
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
+
+Error SchemaTreeBuilder::takeDbSetTypeCloseError(Token* token) {
+    auto message = fmt::format("Expect '>' to close dbset type. Error at [{}, {}].", token->index.row(), token->index.col());
+    Error error = {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_NO_DBSET_TYPE_CLOSE,
+            .message = message
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
+
+Error SchemaTreeBuilder::takeDbSetTypeError(Token* token) {
+    auto message = fmt::format("Expect dbset entity type name. Error at [{}, {}].", token->index.row(), token->index.col());
+    Error error = {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_NO_DBSET_TYPE_NAME,
+            .message = message
+    };
+    syntaxErrors.push_back(error);
+    return error;
+}
+
+
+Error SchemaTreeBuilder::takeDbSetNameError(Token* token) {
+    auto message = fmt::format("Expect dbset collections name. Error at [{}, {}].", token->index.row(), token->index.col());
+    Error error = {
+            .type = ERR_TYPE_SYNTAX,
+            .syntaxErrorCode = SYNTAX_ERR_NO_DBSET_NAME,
+            .message = message
     };
     syntaxErrors.push_back(error);
     return error;

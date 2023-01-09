@@ -6,13 +6,15 @@
 #define JULIA_ORM_ANNOTATION_HPP
 
 #include <string>
+#include <fmt/format.h>
 
 class Annotation {
 public:
     std::string name;
 
     [[nodiscard]] std::string toString() const {
-        return "@" + name + "()";
+        auto text = fmt::format("@{}", name);
+        return text;
     }
 };
 

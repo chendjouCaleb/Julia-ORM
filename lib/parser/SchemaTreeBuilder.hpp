@@ -38,7 +38,9 @@ public:
     Field* takeField();
     DbSet* takeDbSet();
     Interface* takeInterface();
+    TypeCall* takeTypeCall();
     TypeBlock takeBlock();
+
 
     Annotation* takeAnnotation();
     std::vector<Annotation*> takeAnnotations();
@@ -55,6 +57,13 @@ public:
     Error takeFieldTypeError(Token* token);
 
     Error takeSemiColonError(Token* token);
+
+    Error takeTypeArrayCloseError(Token* token);
+
+    Error takeDbSetTypeError(Token *token);
+    Error takeDbSetNameError(Token* token);
+    Error takeDbSetTypeOpenError(Token* token);
+    Error takeDbSetTypeCloseError(Token* token);
 
     DbSchema* schema() {
         return _schema;

@@ -8,20 +8,15 @@
 #include <string>
 #include <schema/Entity.hpp>
 #include "Annotation.hpp"
-
-enum FieldType {
-    FT_INT,
-    FT_DOUBLE,
-    FT_STRING,
-    FT_CHAR,
-    FT_BOOLEAN
-};
+#include "BasicType.hpp"
+#include "TypeCall.hpp"
 
 class Field {
 public:
     std::string name;
     std::string typeName;
-    FieldType basicType;
+    TypeCall *type;
+
 
     std::vector<Annotation*> annotations;
 

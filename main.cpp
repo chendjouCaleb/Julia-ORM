@@ -14,10 +14,10 @@ int main() {
                        "entity Author { @PrimaryKey id: int; name: string ; books: Book[] }";
 
     std::string schema_text2 = R"(
-                        database DbName {dbset<Book> books; dbset<Author> authors;}
+                        database DbName {dbset <Book> books; dbset<Author> authors;}
                        interface PrimaryKey { id: int; name: string; }
                        entity Book{ @Auto @PrimaryKey id: int; title: string; subTitle: string; author: Author; authorId: int; }
-                       entity Author { id: int; name: string;})"
+                       entity Author { id: int; name: string; books: Book [];})"
                         ;
 //    float a = .8;
 //    Tokenizer tokenizer = Tokenizer::create(schema_text2);

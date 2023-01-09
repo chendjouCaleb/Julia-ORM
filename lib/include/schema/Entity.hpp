@@ -6,6 +6,7 @@
 #define JULIA_ORM_ENTITY_HPP
 
 #include <string>
+#include <fmt/format.h>
 #include <vector>
 #include "Field.hpp"
 
@@ -15,7 +16,7 @@ public:
     std::vector<Field*> fields;
 
     std::string toString() {
-        std::string value = "entity " + name + " {\n";
+        std::string value = fmt::format("entity {} {{\n", name);
 
         for(auto field: fields) {
             value.append("    " + field->toString() + "\n");
