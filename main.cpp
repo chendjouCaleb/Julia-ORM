@@ -15,7 +15,7 @@ int main() {
 
     std::string schema_text2 = R"(
                         database DbName {dbset <Book> books; dbset<Author> authors;}
-                       interface PrimaryKey { id: int; name: string; }
+                       interface PrimaryKey { id:int; name: string; }
                        entity Book{ @Auto @PrimaryKey id: int; title: string; subTitle: string; author: Author; authorId: int; }
                        entity Author { id: int; name: string; books: Book [];})"
                         ;
